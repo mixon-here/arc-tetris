@@ -155,7 +155,7 @@ export default function App() {
              audio.play();
           } catch(e) {}
        }
-       setTimeout(() => setShowToasty(null), tetrisEffect === "mega" ? 1500 : 1000);
+       setTimeout(() => setShowToasty(null), 1200);
     }
   }, [tetrisEffect]);
 
@@ -369,7 +369,7 @@ export default function App() {
 
         {/* Center Canvas */}
         <div className="flex-shrink-0 relative">
-            <div className={`bg-neutral-950 p-2 sm:p-3 border-4 border-green-600 shadow-[0_0_40px_rgba(0,255,0,0.3)] transition-all relative overflow-hidden ${tetrisEffect ? 'tetris-flash' : ''}`}>
+            <div className={`bg-neutral-950 p-2 sm:p-3 border-4 border-green-600 shadow-[0_0_40px_rgba(0,255,0,0.3)] transition-all relative ${tetrisEffect ? 'tetris-flash' : ''}`}>
               <div 
                 className="grid bg-[#070707] border border-neutral-900 w-[260px] h-[520px] sm:w-[320px] sm:h-[640px] md:w-[360px] md:h-[720px] mx-auto"
                 style={{
@@ -398,21 +398,21 @@ export default function App() {
               {showToasty && (
                 <>
                   {/* Bottom Right Tims */}
-                  <div className={`absolute bottom-[-10px] right-[-10px] z-[60] origin-bottom-right drop-shadow-2xl ${showToasty === 'mega' ? 'animate-bounce' : 'animate-toasty'}`}>
+                  <div className={`absolute bottom-[0px] right-[0px] z-[60] text-center drop-shadow-2xl ${showToasty === 'mega' ? 'animate-toasty' : 'animate-toasty'}`}>
                     <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
                   </div>
 
                   {showToasty === 'mega' && (
                       <>
-                      <div className={`absolute bottom-[-10px] left-[-10px] z-[60] origin-bottom-left drop-shadow-2xl animate-bounce`}>
+                      <div className={`absolute bottom-[0px] left-[0px] z-[60] drop-shadow-2xl animate-toasty-bl`}>
                          <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleX(-1)"}} />
                       </div>
                       
-                      <div className={`absolute top-[-10px] right-[-10px] z-[60] origin-top-right drop-shadow-2xl animate-bounce`}>
+                      <div className={`absolute top-[0px] right-[0px] z-[60] drop-shadow-2xl animate-toasty-tr`}>
                          <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleY(-1)"}} />
                       </div>
                       
-                      <div className={`absolute top-[-10px] left-[-10px] z-[60] origin-top-left drop-shadow-2xl animate-bounce`}>
+                      <div className={`absolute top-[0px] left-[0px] z-[60] drop-shadow-2xl animate-toasty-tl`}>
                          <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scale(-1, -1)"}} />
                       </div>
                       </>
@@ -527,14 +527,14 @@ export default function App() {
                   </div>
               </div>
               
-              {score >= 30000 && (
+              {score >= 5000 && (
                  <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-4 text-center animate-pulse">
-                    <div className="text-yellow-400 font-bold mb-2">🎉 30k CLUB! 🎉</div>
+                    <div className="text-yellow-400 font-bold mb-2">🎉 {score} PTS CLUB! 🎉</div>
                     <p className="text-xs text-yellow-300 mb-3">You qualify for the exclusive Arc Tetris NFT!</p>
                     <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all">
                        MINT ON ARC
                     </button>
-                    <p className="text-[9px] text-yellow-600 mt-2 mt-2">* On-chain pixel art generation pending</p>
+                    <p className="text-[9px] text-yellow-600 mt-2">* On-chain pixel art generation pending</p>
                  </div>
               )}
               

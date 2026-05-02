@@ -265,27 +265,29 @@ export const useTetris = () => {
                 case 3: linePoints = 500 * level; break;
                 case 4: 
                     linePoints = 1200 * level; // Tetris!
-                    if (points > 0) {
-                        points += 5000; // Ultra bonus ARC TETRIS
-                        setTetrisEffect("mega");
-                    } else {
-                        setTetrisEffect("tetris");
-                    }
                     setTetrisClears(prev => prev + 1);
-                    setTimeout(() => setTetrisEffect(null), 800);
                     break;
                 default:
                     linePoints = 1200 * level;
                     setTetrisClears(prev => prev + 1);
                     break;
             }
-            if (sweptCount === 4) {
-               playSound('tetris');
-               if (points > 0) setTimeout(() => playSound('arc'), 600);
+            
+            if (points > 0) {
+                // ARC bonus!
+                points += 5000;
+                setTetrisEffect("mega");
+                setTimeout(() => setTetrisEffect(null), 800);
+                playSound('arc');
+            } else if (sweptCount >= 4) {
+                // Regular Tetris
+                setTetrisEffect("tetris");
+                setTimeout(() => setTetrisEffect(null), 800);
+                playSound('tetris');
             } else {
-               playSound('clear');
-               if (points > 0) setTimeout(() => playSound('arc'), 300);
+                playSound('clear');
             }
+            
             setScore(prev => prev + linePoints + points);
           }
         }, 0);
