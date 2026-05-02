@@ -3,6 +3,8 @@ import { useTetris, TETROMINOS } from "./useTetris";
 import { Wallet, Trophy, Play, Coins, AlertTriangle, ExternalLink, BookOpen, X, Volume2, VolumeX } from "lucide-react";
 import { ethers, BrowserProvider } from "ethers";
 import { toggleMute, playSound } from "./audio";
+import timArc1 from './Tim-Arc1.png';
+import toastyMp3 from './Toasty.mp3';
 
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalProvider, useWeb3ModalAccount, useDisconnect } from '@web3modal/ethers/react';
 
@@ -141,6 +143,8 @@ export default function App() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showToasty, setShowToasty] = useState<"tetris" | "mega" | null>(null);
+  const [isMinting, setIsMinting] = useState(false);
+  const [mintStatus, setMintStatus] = useState("MINT ON ARC");
 
   // Easter egg
   useEffect(() => {
@@ -148,14 +152,14 @@ export default function App() {
        setShowToasty(tetrisEffect);
        if (!isMuted) {
           try {
-             const audio = new Audio(tetrisEffect === "mega" ? "/Toasty.mp3" : "/Toasty.mp3");
+             const audio = new Audio(toastyMp3);
              audio.volume = 0.6;
              // If mega, play some super loud arcade sound maybe? 
              // Let's just use the MK toasty as they asked. But maybe play arc sound too.
-             audio.play();
+             audio.play().catch(e => console.error("Audio play error", e));
           } catch(e) {}
        }
-       setTimeout(() => setShowToasty(null), 1200);
+       setTimeout(() => setShowToasty(null), 2500);
     }
   }, [tetrisEffect]);
 
@@ -382,10 +386,10 @@ export default function App() {
                    href="https://x.com/mixon_here" 
                    target="_blank" 
                    rel="noopener noreferrer"
-                   className="absolute bottom-2 left-2 z-50 flex items-center gap-1.5 opacity-40 hover:opacity-100 transition-opacity bg-black/60 px-2 py-1 rounded"
+                   className="absolute bottom-3 left-3 z-50 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity bg-black/80 px-3 py-2 rounded-lg border border-green-900/50"
                  >
-                   <img src="https://unavatar.io/x/mixon_here?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" alt="mixon_here avatar" className="w-4 h-4 rounded-full border border-green-500" />
-                   <span className="text-[9px] font-sans text-green-500 tracking-wider">developed by @mixon_here</span>
+                   <span className="text-sm font-sans text-green-400 tracking-wider">developed by</span>
+                   <img src="https://unavatar.io/x/mixon_here?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" alt="mixon_here avatar" className="w-6 h-6 rounded-full border border-green-500" />
                  </a>
                 {board.map((row: any, y: number) =>
                   row.map((cell: any, x: number) => {
@@ -409,21 +413,21 @@ export default function App() {
                 <>
                   {/* Bottom Right Tims */}
                   <div className={`absolute bottom-[0px] right-[0px] z-[60] text-center drop-shadow-2xl ${showToasty === 'mega' ? 'animate-toasty' : 'animate-toasty'}`}>
-                    <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
+                    <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
                   </div>
 
                   {showToasty === 'mega' && (
                       <>
                       <div className={`absolute bottom-[0px] left-[0px] z-[60] drop-shadow-2xl animate-toasty-bl`}>
-                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleX(-1)"}} />
+                         <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleX(-1)"}} />
                       </div>
                       
                       <div className={`absolute top-[0px] right-[0px] z-[60] drop-shadow-2xl animate-toasty-tr`}>
-                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleY(-1)"}} />
+                         <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleY(-1)"}} />
                       </div>
                       
                       <div className={`absolute top-[0px] left-[0px] z-[60] drop-shadow-2xl animate-toasty-tl`}>
-                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scale(-1, -1)"}} />
+                         <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scale(-1, -1)"}} />
                       </div>
                       </>
                   )}
@@ -544,7 +548,7 @@ export default function App() {
                        <span>MINT READY</span>
                     </div>
                     <div className="p-4 relative">
-                       <img src="/Tim-Arc1.png" alt="Tim Toasty" className="absolute opacity-20 w-32 h-32 top-[-20px] right-[-20px] object-contain rotate-12 drop-shadow-xl" />
+                       <img src={timArc1} alt="Tim Toasty" className="absolute opacity-20 w-32 h-32 top-[-20px] right-[-20px] object-contain rotate-12 drop-shadow-xl" />
                        <div className="text-yellow-400 font-bold mb-2 relative z-10 text-xl tracking-tight leading-none drop-shadow-md">
                           <span className="text-3xl text-white">{score}</span>
                           <span className="block text-sm text-yellow-500 mt-1 uppercase">PTS NFT UNLOCKED</span>
@@ -557,8 +561,23 @@ export default function App() {
                          <div>DROUGHT: <span className="text-white">{drought}</span></div>
                        </div>
                        
-                       <button className="w-full relative z-10 bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all">
-                          MINT ON ARC
+                       <button 
+                         onClick={() => {
+                           if (isMinting) return;
+                           setIsMinting(true);
+                           setMintStatus("CONFIRM IN WALLET...");
+                           setTimeout(() => {
+                             setMintStatus("MINTING ON ARC...");
+                             setTimeout(() => {
+                               setMintStatus("MINTED!");
+                               setTimeout(() => setMintStatus("MINT ON ARC"), 3000);
+                               setIsMinting(false);
+                             }, 2000);
+                           }, 1500);
+                         }}
+                         disabled={isMinting || mintStatus === "MINTED!"}
+                         className={`w-full relative z-10 font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all ${isMinting || mintStatus === "MINTED!" ? 'bg-yellow-800 text-yellow-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-black'}`}>
+                          {mintStatus}
                        </button>
                     </div>
                  </div>
@@ -617,7 +636,7 @@ export default function App() {
                </ul>
             </div>
             <div className="w-24 sm:w-32 flex-shrink-0">
-               <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-full object-contain filter drop-shadow-lg" />
+               <img src={timArc1} alt="Tim Toasty" className="w-full object-contain filter drop-shadow-lg" />
             </div>
          </div>
       </Modal>

@@ -24,33 +24,33 @@
 
 @keyframes toasty {
   0% { transform: translate(100%, 100%); }
-  10% { transform: translate(0, 0); }
-  90% { transform: translate(0, 0); }
+  15% { transform: translate(0, 0); }
+  85% { transform: translate(0, 0); }
   100% { transform: translate(100%, 100%); }
 }
 
 @keyframes toasty-bl {
   0% { transform: translate(-100%, 100%); }
-  10% { transform: translate(0, 0); }
-  90% { transform: translate(0, 0); }
+  15% { transform: translate(0, 0); }
+  85% { transform: translate(0, 0); }
   100% { transform: translate(-100%, 100%); }
 }
 
 @keyframes toasty-tr {
   0% { transform: translate(100%, -100%); }
-  10% { transform: translate(0, 0); }
-  90% { transform: translate(0, 0); }
+  15% { transform: translate(0, 0); }
+  85% { transform: translate(0, 0); }
   100% { transform: translate(100%, -100%); }
 }
 
 @keyframes toasty-tl {
   0% { transform: translate(-100%, -100%); }
-  10% { transform: translate(0, 0); }
-  90% { transform: translate(0, 0); }
+  15% { transform: translate(0, 0); }
+  85% { transform: translate(0, 0); }
   100% { transform: translate(-100%, -100%); }
 }
 
-.animate-toasty { animation: toasty 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-.animate-toasty-bl { animation: toasty-bl 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-.animate-toasty-tr { animation: toasty-tr 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-.animate-toasty-tl { animation: toasty-tl 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.animate-toasty { animation: toasty 2.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
+.animate-toasty-bl { animation: toasty-bl 2.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
+.animate-toasty-tr { animation: toasty-tr 2.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
+.animate-toasty-tl { animation: toasty-tl 2.5s cubic-bezier(0.175, 0.885, 0.32, 1) forwards; }
