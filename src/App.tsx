@@ -404,16 +404,16 @@ export default function App() {
 
                   {showToasty === 'mega' && (
                       <>
-                      <div className={`absolute bottom-[-10px] left-[-10px] z-[60] origin-bottom-left drop-shadow-2xl animate-bounce -scale-x-100`}>
-                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
+                      <div className={`absolute bottom-[-10px] left-[-10px] z-[60] origin-bottom-left drop-shadow-2xl animate-bounce`}>
+                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleX(-1)"}} />
                       </div>
                       
-                      <div className={`absolute top-[-10px] right-[-10px] z-[60] origin-top-right drop-shadow-2xl animate-bounce -scale-y-100`}>
-                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
+                      <div className={`absolute top-[-10px] right-[-10px] z-[60] origin-top-right drop-shadow-2xl animate-bounce`}>
+                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleY(-1)"}} />
                       </div>
                       
-                      <div className={`absolute top-[-10px] left-[-10px] z-[60] origin-top-left drop-shadow-2xl animate-bounce scale-[-1]`}>
-                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
+                      <div className={`absolute top-[-10px] left-[-10px] z-[60] origin-top-left drop-shadow-2xl animate-bounce`}>
+                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scale(-1, -1)"}} />
                       </div>
                       </>
                   )}
@@ -526,6 +526,18 @@ export default function App() {
                      <div className="text-xl text-blue-300">{level.toString().padStart(2, '0')}</div>
                   </div>
               </div>
+              
+              {score >= 30000 && (
+                 <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-4 text-center animate-pulse">
+                    <div className="text-yellow-400 font-bold mb-2">🎉 30k CLUB! 🎉</div>
+                    <p className="text-xs text-yellow-300 mb-3">You qualify for the exclusive Arc Tetris NFT!</p>
+                    <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all">
+                       MINT ON ARC
+                    </button>
+                    <p className="text-[9px] text-yellow-600 mt-2 mt-2">* On-chain pixel art generation pending</p>
+                 </div>
+              )}
+              
               <div className="flex justify-between gap-4">
                   <div className="flex-1">
                      <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1 text-nowrap">TETRIS RATE</div>

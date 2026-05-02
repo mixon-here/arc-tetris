@@ -69,7 +69,12 @@ export const useTetris = () => {
   const [dropTime, setDropTime] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(true);
   
-  const [player, setPlayer] = useState({
+  const [player, setPlayer] = useState<{
+    pos: { x: number; y: number };
+    tetromino: (string | number)[][];
+    arcLetters: string[][];
+    collided: boolean;
+  }>({
     pos: { x: BOARD_WIDTH / 2 - 2, y: 0 },
     tetromino: TETROMINOS[0].shape,
     arcLetters: [[""]],
@@ -201,11 +206,13 @@ export const useTetris = () => {
   }, [initialPlayer]);
 
   useEffect(() => {
+    if (!player) return;
+
     let linesClearedThisTick = 0;
     let arcBonus = 0;
 
     setBoard(prevBoard => {
-      const newBoard = prevBoard.map((row: any) =>
+      let newBoard = prevBoard.map((row: any) =>
         row.map((cell: any) => (cell[1] === "clear" ? [0, "clear", ""] : cell))
       );
 
@@ -215,7 +222,6 @@ export const useTetris = () => {
             const bY = y + player.pos.y;
             const bX = x + player.pos.x;
             if (newBoard[bY] && newBoard[bY][bX] !== undefined) {
-                // Do not overwrite merged blocks - this fixes the superimposing bug on Game Over
                 if (newBoard[bY][bX][1] !== "merged" || player.collided) {
                    newBoard[bY][bX] = [value, `${player.collided ? "merged" : "clear"}`, player.arcLetters[y][x]];
                 }
@@ -225,12 +231,14 @@ export const useTetris = () => {
       });
 
       if (player.collided) {
-        const sweepRows = newBoard.reduce((ack: any[], row: any[]) => {
+        let sweptCount = 0;
+        let points = 0;
+        newBoard = newBoard.reduce((ack: any[], row: any[]) => {
           if (row.findIndex((cell: any) => cell[0] === 0) === -1) {
-            linesClearedThisTick += 1;
+            sweptCount += 1;
             const letters = row.map((cell: any) => cell[2] || " ").join("");
             if (letters.replace(/\s+/g,"").includes("ARC")) {
-               arcBonus += 1000;
+               points += 1000;
             }
             ack.unshift(new Array(BOARD_WIDTH).fill([0, "clear", ""]));
             return ack;
@@ -238,51 +246,54 @@ export const useTetris = () => {
           ack.push(row);
           return ack;
         }, []);
-        return sweepRows;
+        linesClearedThisTick = sweptCount;
+        arcBonus = points;
+
+        setTimeout(() => {
+          if (player.pos.y >= 0) { 
+             initialPlayer();
+          }
+          
+          if (sweptCount > 0) {
+            setLinesClearedLocal(prev => prev + sweptCount);
+            setRows(prev => prev + sweptCount);
+            
+            let linePoints = 0;
+            switch(sweptCount) {
+                case 1: linePoints = 100 * level; break;
+                case 2: linePoints = 300 * level; break;
+                case 3: linePoints = 500 * level; break;
+                case 4: 
+                    linePoints = 1200 * level; // Tetris!
+                    if (points > 0) {
+                        points += 5000; // Ultra bonus ARC TETRIS
+                        setTetrisEffect("mega");
+                    } else {
+                        setTetrisEffect("tetris");
+                    }
+                    setTetrisClears(prev => prev + 1);
+                    setTimeout(() => setTetrisEffect(null), 800);
+                    break;
+                default:
+                    linePoints = 1200 * level;
+                    setTetrisClears(prev => prev + 1);
+                    break;
+            }
+            if (sweptCount === 4) {
+               playSound('tetris');
+               if (points > 0) setTimeout(() => playSound('arc'), 600);
+            } else {
+               playSound('clear');
+               if (points > 0) setTimeout(() => playSound('arc'), 300);
+            }
+            setScore(prev => prev + linePoints + points);
+          }
+        }, 0);
       }
+
       return newBoard;
     });
 
-    if (player.collided) {
-      if (player.pos.y >= 0) { // Call initialPlayer no matter what if we collided, wait, Game Over will stop this later
-         initialPlayer();
-      }
-      
-      if (linesClearedThisTick > 0) {
-        setLinesClearedLocal(prev => prev + linesClearedThisTick);
-        setRows(prev => prev + linesClearedThisTick);
-        
-        let linePoints = 0;
-        switch(linesClearedThisTick) {
-            case 1: linePoints = 100 * level; break;
-            case 2: linePoints = 300 * level; break;
-            case 3: linePoints = 500 * level; break;
-            case 4: 
-                linePoints = 1200 * level; // Tetris!
-                if (arcBonus > 0) {
-                    arcBonus += 5000; // Ultra bonus ARC TETRIS
-                    setTetrisEffect("mega");
-                } else {
-                    setTetrisEffect("tetris");
-                }
-                setTetrisClears(prev => prev + 1);
-                setTimeout(() => setTetrisEffect(null), 800);
-                break;
-            default:
-                linePoints = 1200 * level;
-                setTetrisClears(prev => prev + 1);
-                break;
-        }
-        if (linesClearedThisTick === 4) {
-           playSound('tetris');
-           if (arcBonus > 0) setTimeout(() => playSound('arc'), 600);
-        } else {
-           playSound('clear');
-           if (arcBonus > 0) setTimeout(() => playSound('arc'), 300);
-        }
-        setScore(prev => prev + linePoints + arcBonus);
-      }
-    }
   }, [player, initialPlayer, level]);
 
   // keydown events
