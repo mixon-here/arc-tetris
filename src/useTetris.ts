@@ -144,6 +144,7 @@ export const useTetris = () => {
   }, [player, board]);
 
   const drop = useCallback(() => {
+    if (player.collided || gameOver) return;
     if (rows > (level + 1) * 10) {
       setLevel(prev => prev + 1);
       setDropTime(1000 / (level + 1) + 200);

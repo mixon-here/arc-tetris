@@ -371,12 +371,22 @@ export default function App() {
         <div className="flex-shrink-0 relative">
             <div className={`bg-neutral-950 p-2 sm:p-3 border-4 border-green-600 shadow-[0_0_40px_rgba(0,255,0,0.3)] transition-all relative ${tetrisEffect ? 'tetris-flash' : ''}`}>
               <div 
-                className="grid bg-[#070707] border border-neutral-900 w-[260px] h-[520px] sm:w-[320px] sm:h-[640px] md:w-[360px] md:h-[720px] mx-auto"
+                className="grid bg-[#070707] border border-neutral-900 w-[260px] h-[520px] sm:w-[320px] sm:h-[640px] md:w-[360px] md:h-[720px] mx-auto relative"
                 style={{
                   gridTemplateRows: `repeat(${board.length}, minmax(0, 1fr))`,
                   gridTemplateColumns: `repeat(${board[0].length}, minmax(0, 1fr))`,
                 }}
               >
+                 {/* Developer Tag */}
+                 <a 
+                   href="https://x.com/mixon_here" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   className="absolute bottom-2 left-2 z-50 flex items-center gap-1.5 opacity-40 hover:opacity-100 transition-opacity bg-black/60 px-2 py-1 rounded"
+                 >
+                   <img src="https://unavatar.io/x/mixon_here?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" alt="mixon_here avatar" className="w-4 h-4 rounded-full border border-green-500" />
+                   <span className="text-[9px] font-sans text-green-500 tracking-wider">developed by @mixon_here</span>
+                 </a>
                 {board.map((row: any, y: number) =>
                   row.map((cell: any, x: number) => {
                     const blockType = cell[0];
@@ -528,13 +538,29 @@ export default function App() {
               </div>
               
               {score >= 5000 && (
-                 <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-4 text-center animate-pulse">
-                    <div className="text-yellow-400 font-bold mb-2">🎉 {score} PTS CLUB! 🎉</div>
-                    <p className="text-xs text-yellow-300 mb-3">You qualify for the exclusive Arc Tetris NFT!</p>
-                    <button className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all">
-                       MINT ON ARC
-                    </button>
-                    <p className="text-[9px] text-yellow-600 mt-2">* On-chain pixel art generation pending</p>
+                 <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-0 text-center animate-pulse relative overflow-hidden">
+                    <div className="bg-yellow-600 px-2 py-1 text-[10px] text-black font-bold tracking-widest border-b border-yellow-500 flex justify-between items-center">
+                       <span>ARC TETRIS EXCLUSIVE</span>
+                       <span>MINT READY</span>
+                    </div>
+                    <div className="p-4 relative">
+                       <img src="/Tim-Arc1.png" alt="Tim Toasty" className="absolute opacity-20 w-32 h-32 top-[-20px] right-[-20px] object-contain rotate-12 drop-shadow-xl" />
+                       <div className="text-yellow-400 font-bold mb-2 relative z-10 text-xl tracking-tight leading-none drop-shadow-md">
+                          <span className="text-3xl text-white">{score}</span>
+                          <span className="block text-sm text-yellow-500 mt-1 uppercase">PTS NFT UNLOCKED</span>
+                       </div>
+                       
+                       <div className="grid grid-cols-2 gap-2 text-left bg-black/40 border border-yellow-500/30 p-2 mb-3 relative z-10 text-[10px] text-yellow-300 font-mono tracking-tighter">
+                         <div>LINES: <span className="text-white">{linesClearedLocal}</span></div>
+                         <div>LEVEL: <span className="text-white">{level}</span></div>
+                         <div>TETRIS RATE: <span className="text-white">{tetrisRate}%</span></div>
+                         <div>DROUGHT: <span className="text-white">{drought}</span></div>
+                       </div>
+                       
+                       <button className="w-full relative z-10 bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all">
+                          MINT ON ARC
+                       </button>
+                    </div>
                  </div>
               )}
               
@@ -579,14 +605,21 @@ export default function App() {
 
       {/* Modals */}
       <Modal isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} title="HOW TO PLAY Arc Tetris">
-         <p>Arc Tetris is a classic block-stacking puzzle game merged with onchain features!</p>
-         <ul className="list-disc pl-5 space-y-3 mt-4 text-green-300">
-            <li><strong>Clear Lines:</strong> Fill an entire horizontal row to clear it and earn points. The game speeds up every 10 lines!</li>
-            <li><strong>Score a 'TETRIS':</strong> Clear 4 lines at once (using the long 'I' piece) for a massive point boost. Watch your Tetris Rate climb!</li>
-            <li><strong>Arc Bonus:</strong> Look out for blocks containing the letters <strong>A</strong>, <strong>R</strong>, <strong>C</strong>.</li>
-            <li><strong>Ultra Bonus:</strong> If you clear a line that creates the word A-R-C, you get a +1000pts Ultra Bonus!</li>
-            <li><strong>Compete:</strong> Connect your wallet to <strong>Arc testnet</strong> to post your highest score to the global leaderboard.</li>
-         </ul>
+         <div className="flex gap-4">
+            <div className="flex-1">
+               <p>Arc Tetris is a classic block-stacking puzzle game merged with onchain features!</p>
+               <ul className="list-disc pl-5 space-y-3 mt-4 text-green-300">
+                  <li><strong>Clear Lines:</strong> Fill an entire horizontal row to clear it and earn points. The game speeds up every 10 lines!</li>
+                  <li><strong>Score a 'TETRIS':</strong> Clear 4 lines at once (using the long 'I' piece) for a massive point boost. Watch your Tetris Rate climb!</li>
+                  <li><strong>Arc Bonus:</strong> Look out for blocks containing the letters <strong>A</strong>, <strong>R</strong>, <strong>C</strong>.</li>
+                  <li><strong>Ultra Bonus:</strong> If you clear a line that creates the word A-R-C, you get a +1000pts Ultra Bonus!</li>
+                  <li><strong>Compete:</strong> Connect your wallet to <strong>Arc testnet</strong> to post your highest score to the global leaderboard.</li>
+               </ul>
+            </div>
+            <div className="w-24 sm:w-32 flex-shrink-0">
+               <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-full object-contain filter drop-shadow-lg" />
+            </div>
+         </div>
       </Modal>
 
       <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="ABOUT Arc testnet">
