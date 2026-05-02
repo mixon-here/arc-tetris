@@ -1,0 +1,6 @@
+{
+  "name": "Arc Tetris - Web3 Game",
+  "description": "Play Tetris and earn points on leaderboards via Arc network transactions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
