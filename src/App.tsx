@@ -787,10 +787,10 @@ export default function App() {
          </div>
       </Modal>
 
-      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="Arc FAUCET & NETWORK">
+      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="Arc FAUCET">
          <div className="bg-yellow-900/20 border-l-4 border-yellow-600 p-4">
             <p className="text-yellow-300/80 leading-relaxed text-sm">
-               Arc Tetris uses the Arc network's decentralized infrastructure to save your high scores securely onchain. 
+               Arc Tetris uses the Arc decentralized infrastructure to save your high scores securely onchain. 
                To submit scores, you'll need test USDC tokens for micro-fees (simulating network usage).
             </p>
          </div>
