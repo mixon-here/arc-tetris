@@ -379,7 +379,7 @@ export default function App() {
                     <span>{txCount}</span>
                   </div>
                 )}
-                <div className="text-[10px] text-green-600 text-right mt-1 font-bold">NET: {networkName}</div>
+                <div className="text-[10px] text-green-600 text-right mt-1 font-bold">NET: ARC TESTNET</div>
               </div>
             )}
           </div>
@@ -401,7 +401,7 @@ export default function App() {
                   <div key={i} className="flex items-center justify-between border-b border-green-900/50 pb-2">
                     <span className="flex-1 font-mono truncate mr-2">
                       <span className="text-green-700 mr-2">{(i+1).toString().padStart(2, '0')}</span>
-                      {entry.walletAddress.substring(0, 5)}..{entry.walletAddress.substring(38)}
+                      {entry.walletAddress.substring(0, 6)}...{entry.walletAddress.substring(38)}
                     </span>
                     <span className="text-yellow-500 font-bold">{entry.score} pts</span>
                   </div>
@@ -541,7 +541,7 @@ export default function App() {
                 ) : (
                   <div className="flex flex-col items-center gap-6">
                     <p className="text-xs text-yellow-500 max-w-[280px] leading-relaxed">
-                      Welcome! This is a test Tetris game for testing Arc testnet. Join in and be one of the pioneers!
+                      Welcome! This is a test Tetris game built on the internet financial system. Join in and be one of the pioneers!
                     </p>
                     <p className="text-xs text-purple-400 max-w-[280px] leading-relaxed">
                       Collect a "Tetris" (4 lines) to get an easter egg from Tim, the Arc architect!
@@ -736,7 +736,7 @@ export default function App() {
                 onClick={() => setShowAboutArc(true)} 
                 className="bg-yellow-900/30 hover:bg-yellow-900/60 border-2 border-yellow-700 p-5 text-yellow-500 font-bold tracking-widest text-sm flex items-center justify-between transition-colors shadow-[0_0_15px_rgba(255,255,0,0.1)]"
               >
-                <div>Arc testnet</div>
+                <div>About Arc</div>
                 <AlertTriangle className="w-5 h-5"/>
               </button>
            </div>
@@ -760,7 +760,7 @@ export default function App() {
                   <li><strong>Score a 'TETRIS':</strong> Clear 4 lines at once (using the long 'I' piece) for a massive point boost. Watch your Tetris Rate climb!</li>
                   <li><strong>Arc Bonus:</strong> Look out for blocks containing the letters <strong>A</strong>, <strong>R</strong>, <strong>C</strong>.</li>
                   <li><strong>Ultra Bonus:</strong> If you clear a line that creates the word A-R-C, you get a +1000pts Ultra Bonus!</li>
-                  <li><strong>Compete:</strong> Connect your wallet to <strong>Arc testnet</strong> to post your highest score to the global leaderboard.</li>
+                  <li><strong>Compete:</strong> Connect your wallet to post your highest score to the global leaderboard on Arc.</li>
                </ul>
             </div>
             <div className="w-24 sm:w-32 flex-shrink-0">
@@ -769,17 +769,17 @@ export default function App() {
          </div>
       </Modal>
 
-      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="ABOUT Arc testnet">
+      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="ABOUT Arc">
          <div className="bg-yellow-900/20 border-l-4 border-yellow-600 p-4 mb-4">
             <h3 className="text-yellow-500 font-bold mb-2 flex items-center gap-2">
-               <AlertTriangle className="w-4 h-4"/> ONCHAIN INTEGRATION
+               <AlertTriangle className="w-4 h-4"/> THE INTERNET FINANCIAL SYSTEM
             </h3>
             <p className="text-yellow-300/80 leading-relaxed text-sm">
-               At the end of your game session, a background transaction records your final score to the blockchain.
-               A micro-fee is calculated proportionally based on the number of lines you cleared (simulating network usage).
+               At the end of your game session, Arc seamlessly records your final score directly on the internet financial system.
+               A micro-fee is settled proportionally based on the number of lines you cleared (simulating network usage), creating a transparent leaderboard owned by the players.
             </p>
          </div>
-         <p>Gameplay remains completely uninterrupted, showing how the Arc testnet can bridge the gap between traditional Web2 gaming and Web3 decentralization.</p>
+         <p>Arc provides the essential blockspace for builders. Gameplay remains completely uninterrupted, showing how developers can build persistent, reliable applications on the internet without traditional centralized databases.</p>
          
          <div className="mt-8">
             <a 
@@ -804,7 +804,7 @@ export default function App() {
                   <div className="flex items-center gap-3">
                      <span className="text-green-700 font-bold text-lg w-6 text-right">#{i+1}</span>
                      <span className="font-mono text-green-300 text-sm truncate max-w-[200px] sm:max-w-none">
-                        {entry.walletAddress}
+                        {entry.walletAddress.substring(0, 6)}...{entry.walletAddress.substring(38)}
                      </span>
                   </div>
                   <div className="flex gap-4 sm:ml-auto items-baseline">
