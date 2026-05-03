@@ -53,13 +53,19 @@ const ERC20_ABI = [
 const Modal = ({ isOpen, onClose, title, children }: any) => {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-      <div className="bg-neutral-900 border-4 border-green-600 max-w-lg w-full p-6 shadow-[0_0_50px_rgba(0,255,0,0.3)] relative max-h-[95vh] flex flex-col">
-        <button onClick={onClose} className="absolute top-2 right-2 text-green-500 hover:text-white font-bold p-2">
-          <X className="w-5 h-5" />
+    <div 
+      className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
+      onMouseDown={onClose}
+    >
+      <div 
+        className="bg-neutral-900 border-4 border-green-600 max-w-lg w-full p-4 sm:p-6 shadow-[0_0_50px_rgba(0,255,0,0.3)] relative max-h-[95vh] flex flex-col cursor-auto"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <button onClick={onClose} className="absolute top-1 right-1 sm:top-2 sm:right-2 text-green-500 hover:text-white font-bold p-3">
+          <X className="w-6 h-6" />
         </button>
-        <h2 className="text-xl text-green-400 mb-6 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)] flex-shrink-0 uppercase">{title}</h2>
-        <div className="overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-4 text-sm text-neutral-300">
+        <h2 className="text-lg sm:text-xl text-green-400 mb-4 sm:mb-6 pr-8 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)] flex-shrink-0 uppercase">{title}</h2>
+        <div className="overflow-y-auto pr-1 sm:pr-2 custom-scrollbar flex flex-col gap-3 sm:gap-4 text-xs sm:text-sm text-neutral-300">
           {children}
         </div>
       </div>
@@ -72,7 +78,7 @@ export const generateNFT_SVG = (score: number, lines: number, level: number, tet
   <rect width="100%" height="100%" fill="#0a0a0a" />
   <rect x="2" y="2" width="396" height="396" fill="none" stroke="#16a34a" stroke-width="4" />
   
-  <text x="200" y="50" fill="#4ade80" font-size="32" font-weight="bold" text-anchor="middle">ARC TETRIS</text>
+  <text x="200" y="50" fill="#4ade80" font-size="32" font-weight="bold" text-anchor="middle">Arc Tetris</text>
   <text x="200" y="80" fill="#facc15" font-size="16" letter-spacing="2" text-anchor="middle">ACHIEVEMENT UNLOCKED</text>
   
   <rect x="20" y="110" width="360" height="230" fill="#1e3a8a" fill-opacity="0.2" stroke="#1e3a8a" stroke-width="2" />
@@ -182,7 +188,7 @@ export default function App() {
         alert("Wallet connection or network switch failed.");
       }
     } else {
-      alert("Please install MetaMask or another Web3 Wallet!");
+      alert("Web3 wallet not detected. If you are on mobile, please open this site directly inside the built-in browser of your MetaMask, OKX, or other Web3 wallet app.");
     }
   };
 
@@ -347,6 +353,9 @@ export default function App() {
           <div className="bg-neutral-900 border-4 border-green-700 p-6 rounded-md shadow-[0_0_20px_rgba(0,255,0,0.2)]">
             <div className="flex items-center justify-between mb-6">
                <h1 className="text-3xl text-green-400 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)] leading-snug">Arc<br/>Tetris</h1>
+               <button onClick={handleToggleMute} className="text-green-500 hover:text-green-300 bg-green-900/30 p-2 rounded-md">
+                 {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+               </button>
             </div>
             
             {!walletAddress ? (
@@ -383,19 +392,16 @@ export default function App() {
                     <span>{txCount}</span>
                   </div>
                 )}
-                <div className="text-[10px] text-green-600 text-right mt-1 font-bold">NET: ARC TESTNET</div>
+                <div className="text-[10px] text-green-600 text-right mt-1 font-bold">NET: Arc testnet</div>
               </div>
             )}
           </div>
 
-          <div className="bg-neutral-900 border-4 border-green-700 p-6 shadow-[0_0_20px_rgba(0,255,0,0.2)] flex flex-col">
+          <div className="bg-neutral-900 border-4 border-green-700 p-6 shadow-[0_0_20px_rgba(0,255,0,0.2)] hidden md:flex flex-col">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-sm text-green-500 flex items-center gap-2">
                 <Trophy className="w-4 h-4" /> LEADERBOARD
               </h2>
-              <button onClick={handleToggleMute} className="text-green-500 hover:text-green-300">
-                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </button>
             </div>
             <div className="flex flex-col gap-3 text-xs text-green-400">
               {leaderboard.length === 0 ? (
@@ -545,7 +551,7 @@ export default function App() {
                 ) : (
                   <div className="flex flex-col items-center gap-6">
                     <p className="text-xs text-yellow-500 max-w-[280px] leading-relaxed">
-                      Welcome! This is a test Tetris game built on the internet financial system. Join in and be one of the pioneers!
+                      Welcome! This is a test Tetris game built on the Arc network. Join in and be one of the pioneers!
                     </p>
                     <p className="text-xs text-purple-400 max-w-[280px] leading-relaxed">
                       Collect a "Tetris" (4 lines) to get an easter egg from Tim, the Arc architect!
@@ -636,116 +642,125 @@ export default function App() {
                 </div>
               )}
               
-              {score >= 5000 && (
-                 <div className="mt-4 border border-yellow-500 bg-black text-center animate-pulse relative overflow-hidden">
-                    <div className="bg-yellow-600 px-2 py-1 text-[10px] text-black font-bold tracking-widest border-b border-yellow-500 flex justify-between items-center">
-                       <span>Arc TETRIS EXCLUSIVE</span>
-                       <span>NFT PREVIEW</span>
-                    </div>
-                    <div className="p-4 relative flex flex-col items-center">
-                       <div className="w-[180px] h-[180px] shadow-[0_0_15px_rgba(34,197,94,0.3)] bg-black mb-3 border border-green-800" dangerouslySetInnerHTML={{ __html: generateNFT_SVG(score, linesClearedLocal, level, tetrisClears || 0, tetrisRate || 0, drought).replace(/width="400" height="400"/, 'width="100%" height="100%" viewBox="0 0 400 400"') }} />
-                       
-                       <div className="text-yellow-400 font-bold mb-2 relative z-10 text-xs tracking-tight leading-none drop-shadow-md uppercase">
-                          Your Onchain Achievement
-                       </div>
-                       
-                       <div className="grid grid-cols-2 gap-2 text-left bg-black/40 border border-yellow-500/30 p-2 mb-3 relative z-10 text-[10px] text-yellow-300 font-mono tracking-tighter">
-                         <div>LINES: <span className="text-white">{linesClearedLocal}</span></div>
-                         <div>LEVEL: <span className="text-white">{level}</span></div>
-                         <div>TETRIS RATE: <span className="text-white">{tetrisRate}%</span></div>
-                         <div>DROUGHT: <span className="text-white">{drought}</span></div>
-                       </div>
-                       
-                       <button 
-                         onClick={async () => {
-                           if (isMinting || !provider || !walletAddress) {
-                              if (!walletAddress) alert("Please connect wallet first!");
-                              return;
-                           }
-                           try {
-                             setIsMinting(true);
-                             setMintStatus("CONFIRM IN WALLET...");
-                             const signer = await provider.getSigner();
-                             
-                             setMintStatus("MINTING ON ARC...");
-                             const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
-                             const abi = [
-                               "function mintNFT(uint256 score, uint256 lines, uint256 level, uint256 tetrises, uint256 tetrisRateBps, uint256 drought, string metadataURI) public returns (uint256)"
-                             ];
-                             const contract = new ethers.Contract(contractAddress, abi, signer);
-                             
-                             const tetrisRateBps = isNaN(tetrisRate) ? 0 : Math.floor(tetrisRate * 100);
-                             const metadata_URI = generateMetadataURI(score, linesClearedLocal, level, tetrisClears || 0, tetrisRate || 0, drought);
-                             
-                             const tx = await contract.mintNFT(score, linesClearedLocal, level, tetrisClears || 0, tetrisRateBps, drought, metadata_URI);
-                             
-                             setMintTxHash(tx.hash);
-                             await tx.wait();
-                             
-                             setMintStatus("MINT SUCCESSFUL");
-                             setTimeout(() => {
-                                setMintStatus("MINT NFT");
-                                setMintTxHash(null);
-                             }, 7000);
-                           } catch (e: any) {
-                             console.error("Mint failed", e);
-                             setMintStatus("MINT FAILED");
-                             setTimeout(() => setMintStatus("MINT NFT"), 3000);
-                           } finally {
-                             setIsMinting(false);
-                           }
-                         }}
-                         disabled={isMinting || mintStatus === "MINT SUCCESSFUL"}
-                         className={`w-full relative z-10 font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all ${isMinting || mintStatus === "MINT SUCCESSFUL" ? 'bg-yellow-800 text-yellow-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-black'}`}>
-                          {mintStatus}
-                       </button>
-                       {mintTxHash && (
-                           <div className="text-center mt-2">
-                             <a 
-                               href={`https://testnet.arcscan.app/tx/${mintTxHash}`} 
-                               target="_blank" 
-                               rel="noopener noreferrer"
-                               className="text-[10px] text-yellow-400 hover:text-yellow-300 underline font-mono inline-flex items-center gap-1"
-                             >
-                               VIEW ON EXPLORER <ExternalLink className="w-3 h-3" />
-                             </a>
-                           </div>
-                       )}
-                    </div>
-                 </div>
-              )}
-              
-              <div className="flex justify-between gap-4">
-                  <div className="flex-1">
-                     <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1 text-nowrap">TETRIS RATE</div>
-                     <div className="text-xl text-blue-300">{tetrisRate.toFixed(1)}%</div>
+               <div className="flex justify-between gap-4">
+                   <div className="flex-1">
+                      <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1 text-nowrap">TETRIS RATE</div>
+                      <div className="text-xl text-blue-300">{tetrisRate.toFixed(1)}%</div>
+                   </div>
+                   <div className="flex-1">
+                      <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1">DROUGHT</div>
+                      <div className="text-xl text-blue-300">{drought.toString().padStart(2, '0')}</div>
+                   </div>
+               </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+               <button 
+                 onClick={() => setShowLeaderboard(true)} 
+                 className="md:hidden bg-green-900/30 hover:bg-green-900/60 border-2 border-green-700 p-5 text-green-500 font-bold tracking-widest text-sm flex items-center justify-between transition-colors shadow-[0_0_15px_rgba(0,255,0,0.1)]"
+               >
+                 <div>LEADERBOARD</div>
+                 <Trophy className="w-5 h-5"/>
+               </button>
+
+               <button 
+                 onClick={() => setShowHowToPlay(true)} 
+                 className="bg-purple-900/30 hover:bg-purple-900/60 border-2 border-purple-700 p-5 text-purple-400 font-bold uppercase tracking-widest text-sm flex items-center justify-between transition-colors shadow-[0_0_15px_rgba(128,0,128,0.1)]"
+               >
+                 <div>HOW TO PLAY</div> 
+                 <BookOpen className="w-5 h-5"/>
+               </button>
+
+               <button 
+                 onClick={() => setShowAboutArc(true)} 
+                 className="bg-yellow-900/30 hover:bg-yellow-900/60 border-2 border-yellow-700 p-5 text-yellow-500 font-bold tracking-widest text-sm flex items-center justify-between transition-colors shadow-[0_0_15px_rgba(255,255,0,0.1)]"
+               >
+                 <div>Arc Faucet</div>
+                 <AlertTriangle className="w-5 h-5"/>
+               </button>
+            </div>
+
+            {/* NFT Preview Block */}
+            {score >= 5000 && (
+               <div className="border-4 border-yellow-500 bg-black text-center animate-pulse relative overflow-hidden shadow-[0_0_20px_rgba(255,255,0,0.2)]">
+                  <div className="bg-yellow-600 px-2 py-1 text-[10px] text-black font-bold tracking-widest border-b border-yellow-500 flex justify-between items-center">
+                     <span>Arc Tetris EXCLUSIVE</span>
+                     <span>NFT PREVIEW</span>
                   </div>
-                  <div className="flex-1">
-                     <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1">DROUGHT</div>
-                     <div className="text-xl text-blue-300">{drought.toString().padStart(2, '0')}</div>
+                  <div className="p-4 relative flex flex-col items-center">
+                     <div className="w-[180px] h-[180px] shadow-[0_0_15px_rgba(34,197,94,0.3)] bg-black mb-3 border border-green-800" dangerouslySetInnerHTML={{ __html: generateNFT_SVG(score, linesClearedLocal, level, tetrisClears || 0, tetrisRate || 0, drought).replace(/width="400" height="400"/, 'width="100%" height="100%" viewBox="0 0 400 400"') }} />
+                     
+                     <div className="text-yellow-400 font-bold mb-2 relative z-10 text-xs tracking-tight leading-none drop-shadow-md uppercase">
+                        Your Onchain Achievement
+                     </div>
+                     
+                     <div className="grid grid-cols-2 gap-2 text-left bg-black/40 border border-yellow-500/30 p-2 mb-3 relative z-10 text-[10px] text-yellow-300 font-mono tracking-tighter w-full">
+                       <div>LINES: <span className="text-white">{linesClearedLocal}</span></div>
+                       <div>LEVEL: <span className="text-white">{level}</span></div>
+                       <div>TETRIS RATE: <span className="text-white">{tetrisRate}%</span></div>
+                       <div>DROUGHT: <span className="text-white">{drought}</span></div>
+                     </div>
+                     
+                     <button 
+                       onClick={async () => {
+                         if (isMinting || !provider || !walletAddress) {
+                            if (!walletAddress) alert("Please connect wallet first!");
+                            return;
+                         }
+                         try {
+                           setIsMinting(true);
+                           setMintStatus("CONFIRM IN WALLET...");
+                           const signer = await provider.getSigner();
+                           
+                           setMintStatus("MINTING ON Arc...");
+                           const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+                           const abi = [
+                             "function mintNFT(uint256 score, uint256 lines, uint256 level, uint256 tetrises, uint256 tetrisRateBps, uint256 drought, string metadataURI) public returns (uint256)"
+                           ];
+                           const contract = new ethers.Contract(contractAddress, abi, signer);
+                           
+                           const tetrisRateBps = isNaN(tetrisRate) ? 0 : Math.floor(tetrisRate * 100);
+                           const metadata_URI = generateMetadataURI(score, linesClearedLocal, level, tetrisClears || 0, tetrisRate || 0, drought);
+                           
+                           const tx = await contract.mintNFT(score, linesClearedLocal, level, tetrisClears || 0, tetrisRateBps, drought, metadata_URI);
+                           
+                           setMintTxHash(tx.hash);
+                           await tx.wait();
+                           
+                           setMintStatus("MINT SUCCESSFUL");
+                           setTimeout(() => {
+                              setMintStatus("MINT NFT");
+                              setMintTxHash(null);
+                           }, 7000);
+                         } catch (e: any) {
+                           console.error("Mint failed", e);
+                           setMintStatus("MINT FAILED");
+                           setTimeout(() => setMintStatus("MINT NFT"), 3000);
+                         } finally {
+                           setIsMinting(false);
+                         }
+                       }}
+                       disabled={isMinting || mintStatus === "MINT SUCCESSFUL"}
+                       className={`w-full relative z-10 font-bold py-3 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all ${isMinting || mintStatus === "MINT SUCCESSFUL" ? 'bg-yellow-800 text-yellow-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-black'}`}>
+                        {mintStatus}
+                     </button>
+                     {mintTxHash && (
+                         <div className="text-center mt-3">
+                           <a 
+                             href={`https://testnet.arcscan.app/tx/${mintTxHash}`} 
+                             target="_blank" 
+                             rel="noopener noreferrer"
+                             className="text-[10px] text-yellow-400 hover:text-yellow-300 underline font-mono inline-flex items-center gap-1 bg-yellow-900/50 px-2 py-1"
+                           >
+                             VIEW ON EXPLORER <ExternalLink className="w-3 h-3" />
+                           </a>
+                         </div>
+                     )}
                   </div>
-              </div>
-           </div>
+               </div>
+            )}
 
-           <div className="flex flex-col gap-4">
-              <button 
-                onClick={() => setShowHowToPlay(true)} 
-                className="bg-purple-900/30 hover:bg-purple-900/60 border-2 border-purple-700 p-5 text-purple-400 font-bold uppercase tracking-widest text-sm flex items-center justify-between transition-colors shadow-[0_0_15px_rgba(128,0,128,0.1)]"
-              >
-                <div>HOW TO PLAY</div> 
-                <BookOpen className="w-5 h-5"/>
-              </button>
-
-              <button 
-                onClick={() => setShowAboutArc(true)} 
-                className="bg-yellow-900/30 hover:bg-yellow-900/60 border-2 border-yellow-700 p-5 text-yellow-500 font-bold tracking-widest text-sm flex items-center justify-between transition-colors shadow-[0_0_15px_rgba(255,255,0,0.1)]"
-              >
-                <div>ARC FAUCET</div>
-                <AlertTriangle className="w-5 h-5"/>
-              </button>
-           </div>
-
-           <div className="text-[10px] text-neutral-500 text-center uppercase tracking-widest mt-auto hidden lg:block border-t border-neutral-800 pt-4">
+            <div className="text-[10px] text-neutral-500 text-center uppercase tracking-widest mt-auto hidden lg:block border-t border-neutral-800 pt-4">
              <div className="mb-2">CONTROLS:</div>
              <span className="text-white bg-neutral-800 p-2 border border-neutral-700 rounded-sm shadow-inner block text-center">ARROWS TO MOVE<br/>UP TO ROTATE<br/>SPACE TO HARD DROP</span>
            </div>
@@ -755,7 +770,7 @@ export default function App() {
       </div>
 
       {/* Modals */}
-      <Modal isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} title="HOW TO PLAY ARC TETRIS">
+      <Modal isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} title="HOW TO PLAY Arc Tetris">
          <div className="flex gap-4 items-center">
             <div className="flex-1">
                <ul className="list-disc pl-5 space-y-2 text-green-300 text-xs sm:text-sm">
@@ -772,10 +787,10 @@ export default function App() {
          </div>
       </Modal>
 
-      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="ARC FAUCET & NETWORK">
+      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="Arc FAUCET & NETWORK">
          <div className="bg-yellow-900/20 border-l-4 border-yellow-600 p-4">
             <p className="text-yellow-300/80 leading-relaxed text-sm">
-               Arc Tetris uses the internet financial system to save your high scores securely onchain. 
+               Arc Tetris uses the Arc network's decentralized infrastructure to save your high scores securely onchain. 
                To submit scores, you'll need test USDC tokens for micro-fees (simulating network usage).
             </p>
          </div>
