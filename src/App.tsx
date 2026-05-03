@@ -5,6 +5,7 @@ import { ethers, BrowserProvider } from "ethers";
 import { toggleMute, playSound } from "./audio";
 import timArc1 from './Tim-Arc1.png';
 import toastyMp3 from './Toasty.mp3';
+import { submitFirestoreScore, getLeaderboardScores } from './firebase';
 
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalProvider, useWeb3ModalAccount, useDisconnect } from '@web3modal/ethers/react';
 
@@ -200,8 +201,7 @@ export default function App() {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await fetch("/api/leaderboard");
-      const data = await res.json();
+      const data = await getLeaderboardScores();
       setLeaderboard(data);
     } catch(err) {
       console.error(err);
@@ -229,6 +229,8 @@ export default function App() {
       const perLineFee = 0.0001; 
       const totalFee = (linesClearedLocal * perLineFee).toFixed(4);
 
+      const dataPayload = ethers.hexlify(ethers.toUtf8Bytes(`ARC_TETRIS_SCORE:${score}:LINES:${linesClearedLocal}`));
+
       if (TEST_USDC_ADDRESS && TEST_USDC_ADDRESS !== "0x0000000000000000000000000000000000000000") {
           const usdcContract = new ethers.Contract(TEST_USDC_ADDRESS, ERC20_ABI, signer);
           const amount = ethers.parseUnits(totalFee, 6);
@@ -239,21 +241,14 @@ export default function App() {
           // Native token transaction
           const tx = await signer.sendTransaction({
              to: TREASURY_ADDRESS && TREASURY_ADDRESS !== "0x0000000000000000000000000000000000000000" ? TREASURY_ADDRESS : walletAddress,
-             value: ethers.parseEther(totalFee)
+             value: ethers.parseEther(totalFee),
+             data: dataPayload
           });
           setTxHash(tx.hash);
           await tx.wait();
       }
 
-      await fetch("/api/leaderboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          address: walletAddress,
-          score: score,
-          lines: linesClearedLocal
-        })
-      });
+      await submitFirestoreScore(walletAddress, score, linesClearedLocal);
       fetchLeaderboard();
       if (provider && walletAddress) {
           fetchBalance(provider, walletAddress);
@@ -297,7 +292,18 @@ export default function App() {
         <div className="w-full md:w-72 flex flex-col gap-6 flex-shrink-0">
           
           <div className="bg-neutral-900 border-4 border-green-700 p-6 rounded-md shadow-[0_0_20px_rgba(0,255,0,0.2)]">
-            <h1 className="text-3xl text-green-400 mb-6 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)] leading-snug">Arc<br/>Tetris</h1>
+            <div className="flex items-center justify-between mb-6">
+               <h1 className="text-3xl text-green-400 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)] leading-snug">Arc<br/>Tetris</h1>
+               <a 
+                 href="https://x.com/mixon_here" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="flex flex-col items-center gap-1 opacity-80 hover:opacity-100 transition-opacity bg-black/40 px-2 py-1 rounded border border-green-900/50"
+               >
+                 <span className="text-[9px] font-sans text-green-500 uppercase tracking-widest text-center leading-tight">developed<br/>by</span>
+                 <img src="https://unavatar.io/x/mixon_here?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" alt="mixon_here avatar" className="w-6 h-6 rounded-full border border-green-500" />
+               </a>
+            </div>
             
             {!walletAddress ? (
               <button
@@ -381,16 +387,6 @@ export default function App() {
                   gridTemplateColumns: `repeat(${board[0].length}, minmax(0, 1fr))`,
                 }}
               >
-                 {/* Developer Tag */}
-                 <a 
-                   href="https://x.com/mixon_here" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   className="absolute bottom-3 left-3 z-50 flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity bg-black/80 px-3 py-2 rounded-lg border border-green-900/50"
-                 >
-                   <span className="text-sm font-sans text-green-400 tracking-wider">developed by</span>
-                   <img src="https://unavatar.io/x/mixon_here?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" alt="mixon_here avatar" className="w-6 h-6 rounded-full border border-green-500" />
-                 </a>
                 {board.map((row: any, y: number) =>
                   row.map((cell: any, x: number) => {
                     const blockType = cell[0];
@@ -562,18 +558,36 @@ export default function App() {
                        </div>
                        
                        <button 
-                         onClick={() => {
-                           if (isMinting) return;
-                           setIsMinting(true);
-                           setMintStatus("CONFIRM IN WALLET...");
-                           setTimeout(() => {
+                         onClick={async () => {
+                           if (isMinting || !provider || !walletAddress) {
+                              if (!walletAddress) alert("Please connect wallet first!");
+                              return;
+                           }
+                           try {
+                             setIsMinting(true);
+                             setMintStatus("CONFIRM IN WALLET...");
+                             const signer = await provider.getSigner();
+                             
                              setMintStatus("MINTING ON ARC...");
-                             setTimeout(() => {
-                               setMintStatus("MINTED!");
-                               setTimeout(() => setMintStatus("MINT ON ARC"), 3000);
-                               setIsMinting(false);
-                             }, 2000);
-                           }, 1500);
+                             const dataPayload = ethers.hexlify(ethers.toUtf8Bytes(`ARC_TETRIS_MINT_NFT_SCORE:${score}`));
+                             
+                             const tx = await signer.sendTransaction({
+                               to: "0x0000000000000000000000000000000000000000",
+                               value: 0,
+                               data: dataPayload
+                             });
+                             
+                             await tx.wait();
+                             
+                             setMintStatus("MINTED!");
+                             setTimeout(() => setMintStatus("MINT ON ARC"), 3000);
+                           } catch (e: any) {
+                             console.error("Mint failed", e);
+                             setMintStatus("MINT FAILED");
+                             setTimeout(() => setMintStatus("MINT ON ARC"), 3000);
+                           } finally {
+                             setIsMinting(false);
+                           }
                          }}
                          disabled={isMinting || mintStatus === "MINTED!"}
                          className={`w-full relative z-10 font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all ${isMinting || mintStatus === "MINTED!" ? 'bg-yellow-800 text-yellow-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-black'}`}>
@@ -676,7 +690,7 @@ export default function App() {
                   <div className="flex items-center gap-3">
                      <span className="text-green-700 font-bold text-lg w-6 text-right">#{i+1}</span>
                      <span className="font-mono text-green-300 text-sm truncate max-w-[200px] sm:max-w-none">
-                        {entry.address}
+                        {entry.walletAddress}
                      </span>
                   </div>
                   <div className="flex gap-4 sm:ml-auto items-baseline">
