@@ -64,7 +64,7 @@ export const checkCollision = (player: any, board: any, { x: moveX, y: moveY }: 
   return false;
 };
 
-export const useTetris = () => {
+export const useTetris = (isPaused: boolean = false) => {
   const [board, setBoard] = useState(createBoard());
   const [dropTime, setDropTime] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState(true);
@@ -165,7 +165,7 @@ export const useTetris = () => {
 
   useInterval(() => {
     drop();
-  }, dropTime);
+  }, isPaused ? null : dropTime);
 
   const dropPlayer = useCallback(() => {
     if (player.collided) return;
@@ -302,7 +302,10 @@ export const useTetris = () => {
   // keydown events
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (gameOver || player.collided) return;
+      if (gameOver || player.collided || isPaused) return;
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
+         e.preventDefault();
+      }
       if (e.keyCode === 37) movePlayer(-1);
       else if (e.keyCode === 39) movePlayer(1);
       else if (e.keyCode === 40) dropPlayer();

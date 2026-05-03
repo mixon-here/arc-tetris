@@ -3,8 +3,6 @@ import { useTetris, TETROMINOS } from "./useTetris";
 import { Wallet, Trophy, Play, Coins, AlertTriangle, ExternalLink, BookOpen, X, Volume2, VolumeX } from "lucide-react";
 import { ethers, BrowserProvider } from "ethers";
 import { toggleMute, playSound } from "./audio";
-import timArc1 from './Tim-Arc1.png';
-import toastyMp3 from './Toasty.mp3';
 import { submitFirestoreScore, getLeaderboardScores } from './firebase';
 
 import { createWeb3Modal, defaultConfig, useWeb3Modal, useWeb3ModalProvider, useWeb3ModalAccount, useDisconnect } from '@web3modal/ethers/react';
@@ -70,7 +68,11 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
 };
 
 export default function App() {
-  const { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought } = useTetris();
+  const [isMinting, setIsMinting] = useState(false);
+  const [mintStatus, setMintStatus] = useState("MINT NFT");
+  const [mintTxHash, setMintTxHash] = useState<string | null>(null);
+
+  const { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought } = useTetris(isMinting);
 
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
@@ -144,8 +146,6 @@ export default function App() {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showToasty, setShowToasty] = useState<"tetris" | "mega" | null>(null);
-  const [isMinting, setIsMinting] = useState(false);
-  const [mintStatus, setMintStatus] = useState("MINT ON ARC");
 
   // Easter egg
   useEffect(() => {
@@ -153,7 +153,7 @@ export default function App() {
        setShowToasty(tetrisEffect);
        if (!isMuted) {
           try {
-             const audio = new Audio(toastyMp3);
+             const audio = new Audio("/Toasty.mp3");
              audio.volume = 0.6;
              // If mega, play some super loud arcade sound maybe? 
              // Let's just use the MK toasty as they asked. But maybe play arc sound too.
@@ -361,7 +361,7 @@ export default function App() {
                   <div key={i} className="flex items-center justify-between border-b border-green-900/50 pb-2">
                     <span className="flex-1 font-mono truncate mr-2">
                       <span className="text-green-700 mr-2">{(i+1).toString().padStart(2, '0')}</span>
-                      {entry.address.substring(0, 5)}..{entry.address.substring(39)}
+                      {entry.walletAddress.substring(0, 5)}..{entry.walletAddress.substring(38)}
                     </span>
                     <span className="text-yellow-500 font-bold">{entry.score} pts</span>
                   </div>
@@ -409,21 +409,21 @@ export default function App() {
                 <>
                   {/* Bottom Right Tims */}
                   <div className={`absolute bottom-[0px] right-[0px] z-[60] text-center drop-shadow-2xl ${showToasty === 'mega' ? 'animate-toasty' : 'animate-toasty'}`}>
-                    <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
+                    <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
                   </div>
 
                   {showToasty === 'mega' && (
                       <>
                       <div className={`absolute bottom-[0px] left-[0px] z-[60] drop-shadow-2xl animate-toasty-bl`}>
-                         <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleX(-1)"}} />
+                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleX(-1)"}} />
                       </div>
                       
                       <div className={`absolute top-[0px] right-[0px] z-[60] drop-shadow-2xl animate-toasty-tr`}>
-                         <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleY(-1)"}} />
+                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scaleY(-1)"}} />
                       </div>
                       
                       <div className={`absolute top-[0px] left-[0px] z-[60] drop-shadow-2xl animate-toasty-tl`}>
-                         <img src={timArc1} alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scale(-1, -1)"}} />
+                         <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" style={{transform: "scale(-1, -1)"}} />
                       </div>
                       </>
                   )}
@@ -459,7 +459,7 @@ export default function App() {
                         <div className="flex flex-col items-center gap-6">
                             <div className="text-green-400 text-xs text-center border-2 border-green-800 p-6 bg-green-900/20 max-w-[280px]">
                               TRANSACTION SUCCESSFUL!<br/><br/>
-                              <a href={`https://testnet.arcscan.app/address/${walletAddress}?tab=txs`} target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">VIEW IN EXPLORER</a>
+                              <a href={`https://explorer.testnet.arc.xyz/tx/${txHash}`} target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">VIEW IN EXPLORER</a>
                             </div>
                             <button
                               onClick={() => { setTxHash(null); startGame(); }}
@@ -540,11 +540,11 @@ export default function App() {
               {score >= 5000 && (
                  <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-0 text-center animate-pulse relative overflow-hidden">
                     <div className="bg-yellow-600 px-2 py-1 text-[10px] text-black font-bold tracking-widest border-b border-yellow-500 flex justify-between items-center">
-                       <span>ARC TETRIS EXCLUSIVE</span>
+                       <span> Arc TETRIS EXCLUSIVE</span>
                        <span>MINT READY</span>
                     </div>
                     <div className="p-4 relative">
-                       <img src={timArc1} alt="Tim Toasty" className="absolute opacity-20 w-32 h-32 top-[-20px] right-[-20px] object-contain rotate-12 drop-shadow-xl" />
+                       <img src="/Tim-Arc1.png" alt="Tim Toasty" className="absolute opacity-20 w-32 h-32 top-[-20px] right-[-20px] object-contain rotate-12 drop-shadow-xl" />
                        <div className="text-yellow-400 font-bold mb-2 relative z-10 text-xl tracking-tight leading-none drop-shadow-md">
                           <span className="text-3xl text-white">{score}</span>
                           <span className="block text-sm text-yellow-500 mt-1 uppercase">PTS NFT UNLOCKED</span>
@@ -577,22 +577,38 @@ export default function App() {
                                data: dataPayload
                              });
                              
+                             setMintTxHash(tx.hash);
                              await tx.wait();
                              
-                             setMintStatus("MINTED!");
-                             setTimeout(() => setMintStatus("MINT ON ARC"), 3000);
+                             setMintStatus("MINT SUCCESSFUL");
+                             setTimeout(() => {
+                                setMintStatus("MINT NFT");
+                                setMintTxHash(null);
+                             }, 7000);
                            } catch (e: any) {
                              console.error("Mint failed", e);
                              setMintStatus("MINT FAILED");
-                             setTimeout(() => setMintStatus("MINT ON ARC"), 3000);
+                             setTimeout(() => setMintStatus("MINT NFT"), 3000);
                            } finally {
                              setIsMinting(false);
                            }
                          }}
-                         disabled={isMinting || mintStatus === "MINTED!"}
-                         className={`w-full relative z-10 font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all ${isMinting || mintStatus === "MINTED!" ? 'bg-yellow-800 text-yellow-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-black'}`}>
+                         disabled={isMinting || mintStatus === "MINT SUCCESSFUL"}
+                         className={`w-full relative z-10 font-bold py-2 px-4 shadow-[0_0_10px_rgba(255,255,0,0.5)] transition-all ${isMinting || mintStatus === "MINT SUCCESSFUL" ? 'bg-yellow-800 text-yellow-500 cursor-not-allowed' : 'bg-yellow-500 hover:bg-yellow-400 text-black'}`}>
                           {mintStatus}
                        </button>
+                       {mintTxHash && (
+                           <div className="text-center mt-2">
+                             <a 
+                               href={`https://explorer.testnet.arc.xyz/tx/${mintTxHash}`} 
+                               target="_blank" 
+                               rel="noopener noreferrer"
+                               className="text-[10px] text-yellow-400 hover:text-yellow-300 underline font-mono inline-flex items-center gap-1"
+                             >
+                               VIEW ON EXPLORER <ExternalLink className="w-3 h-3" />
+                             </a>
+                           </div>
+                       )}
                     </div>
                  </div>
               )}
@@ -650,7 +666,7 @@ export default function App() {
                </ul>
             </div>
             <div className="w-24 sm:w-32 flex-shrink-0">
-               <img src={timArc1} alt="Tim Toasty" className="w-full object-contain filter drop-shadow-lg" />
+               <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-full object-contain filter drop-shadow-lg" />
             </div>
          </div>
       </Modal>
