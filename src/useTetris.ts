@@ -88,24 +88,33 @@ export const useTetris = (isPaused: boolean = false) => {
   const [tetrisEffect, setTetrisEffect] = useState<"tetris" | "mega" | null>(null);
   const [tetrisClears, setTetrisClears] = useState(0);
   const [drought, setDrought] = useState(0);
+  const [nextPiece, setNextPiece] = useState<{key: string, shape: any[][], color: string} | null>(null);
 
   const initialPlayer = useCallback(() => {
+    let pieceToUse = nextPiece;
     const rTetro = randomTetromino();
+
+    if (!pieceToUse) {
+      pieceToUse = randomTetromino();
+    }
+    
+    setNextPiece(rTetro);
+
     // I-Piece drought
     setDrought(prev => {
       // Return 0 if the piece is I, otherwise increment
-      if (rTetro.key === 'I') return 0;
+      if (pieceToUse!.key === 'I') return 0;
       // Increment only if we are called uniquely (React strict mode might run this twice, but drought issue was likely due to length check on Z)
       return prev + 1;
     });
 
     setPlayer({
       pos: { x: BOARD_WIDTH / 2 - 2, y: 0 },
-      tetromino: rTetro.shape,
-      arcLetters: generateArcMatrix(rTetro.shape),
+      tetromino: pieceToUse!.shape,
+      arcLetters: generateArcMatrix(pieceToUse!.shape),
       collided: false,
     });
-  }, []);
+  }, [nextPiece]);
 
   const updatePlayerPos = useCallback(({ x, y, collided }: { x: number; y: number; collided: boolean }) => {
     setPlayer(prev => ({
@@ -355,5 +364,5 @@ export const useTetris = (isPaused: boolean = false) => {
 
   const tetrisRate = linesClearedLocal > 0 ? ((tetrisClears * 4) / linesClearedLocal) * 100 : 0;
 
-  return { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought };
+  return { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought, nextPiece, tetrisClears };
 };

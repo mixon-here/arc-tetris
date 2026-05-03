@@ -67,13 +67,49 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
   );
 };
 
+const generateMetadataURI = (score: number, lines: number, level: number, tetrises: number, tetrisRate: number, drought: number) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" style="background:#0a0a0a; border:4px solid #16a34a; font-family:monospace;">
+    <foreignObject x="0" y="0" width="400" height="400">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="color:white; padding: 20px; font-family: monospace;">
+        <h1 style="color:#4ade80; text-align:center; font-size:32px; margin:0; text-shadow:0 0 10px #4ade80;">ARC TETRIS</h1>
+        <h2 style="color:#facc15; text-align:center; font-size:16px; margin-top:5px; margin-bottom:20px; text-transform:uppercase; letter-spacing:4px;">Achievement Unlocked</h2>
+        <div style="border: 2px solid #1e3a8a; background: rgba(30,58,138,0.2); padding: 15px;">
+           <p style="font-size: 18px; margin: 5px 0;">SCORE: <span style="color:#93c5fd">${score}</span></p>
+           <p style="font-size: 18px; margin: 5px 0;">LINES: <span style="color:#93c5fd">${lines}</span></p>
+           <p style="font-size: 18px; margin: 5px 0;">LEVEL: <span style="color:#93c5fd">${level}</span></p>
+           <p style="font-size: 18px; margin: 5px 0;">TETRISES: <span style="color:#93c5fd">${tetrises}</span></p>
+           <p style="font-size: 18px; margin: 5px 0;">TETRIS RATE: <span style="color:#93c5fd">${tetrisRate.toFixed(1)}%</span></p>
+           <p style="font-size: 18px; margin: 5px 0;">DROUGHT: <span style="color:#93c5fd">${drought}</span></p>
+        </div>
+        <p style="color:#6b7280; text-align:center; font-size:12px; margin-top:30px;">Minted on Arc Testnet</p>
+      </div>
+    </foreignObject>
+  </svg>`;
+  
+  const svgBase64 = window.btoa(unescape(encodeURIComponent(svg)));
+  const json = JSON.stringify({
+    name: "Arc Tetris Achievement",
+    description: "Exclusive gameplay achievement from Arc Tetris on Testnet.",
+    image: `data:image/svg+xml;base64,${svgBase64}`,
+    attributes: [
+      { trait_type: "Score", value: score },
+      { trait_type: "Lines", value: lines },
+      { trait_type: "Level", value: level },
+      { trait_type: "Tetrises", value: tetrises },
+      { trait_type: "Tetris Rate", value: tetrisRate },
+      { trait_type: "Drought", value: drought },
+    ]
+  });
+  return `data:application/json;base64,${window.btoa(unescape(encodeURIComponent(json)))}`;
+};
+
 export default function App() {
   const [isMinting, setIsMinting] = useState(false);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [mintStatus, setMintStatus] = useState("MINT NFT");
   const [mintTxHash, setMintTxHash] = useState<string | null>(null);
 
-  const { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought } = useTetris(isMinting || isManuallyPaused);
+  const { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought, nextPiece, tetrisClears } = useTetris(isMinting || isManuallyPaused);
 
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
@@ -482,7 +518,7 @@ export default function App() {
                           </div>
                         ) : (
                           <button
-                            onClick={startGame}
+                            onClick={() => { setIsManuallyPaused(false); startGame(); document.body.focus(); }}
                             className="bg-green-700 hover:bg-green-600 border-2 border-green-400 px-8 py-5 text-white text-sm tracking-widest font-bold"
                           >
                             INSERT COIN (PLAY)
@@ -499,7 +535,7 @@ export default function App() {
                       Collect a "Tetris" (4 lines) to get an easter egg from Tim, the Arc architect!
                     </p>
                     <button
-                      onClick={startGame}
+                      onClick={() => { setIsManuallyPaused(false); startGame(); document.body.focus(); }}
                       className="bg-neutral-800 hover:bg-neutral-700 border-2 border-neutral-600 px-8 py-4 text-white text-sm uppercase tracking-widest"
                     >
                       PLAY OFFLINE
@@ -526,9 +562,26 @@ export default function App() {
         <div className="w-full md:w-72 flex flex-col gap-6 flex-shrink-0">
 
            <div className="bg-neutral-900 border-4 border-blue-700 p-6 flex flex-col gap-6 shadow-[0_0_20px_rgba(0,0,255,0.2)]">
-              <div>
-                 <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1">SCORE</div>
-                 <div className="text-3xl text-blue-300">{score.toString().padStart(6, '0')}</div>
+              <div className="flex gap-4">
+                  <div className="flex-1">
+                     <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1">SCORE</div>
+                     <div className="text-3xl text-blue-300">{score.toString().padStart(6, '0')}</div>
+                  </div>
+                  <div>
+                     <div className="text-[10px] text-blue-500 border-b border-blue-900 mb-2 pb-1">NEXT</div>
+                     <div className="flex justify-center items-center h-[50px] w-[50px] bg-black/40 border border-blue-900/50">
+                        {nextPiece && (
+                             <div className="grid gap-[1px]" style={{
+                                  gridTemplateRows: `repeat(${nextPiece.shape.length}, minmax(0, 1fr))`,
+                                  gridTemplateColumns: `repeat(${nextPiece.shape[0].length}, minmax(0, 1fr))`,
+                             }}>
+                                 {nextPiece.shape.map((r: any, y: number) => r.map((cell: any, x: number) => (
+                                     <div key={`${x}-${y}`} className={`w-3 h-3 ${cell !== 0 ? nextPiece.color : 'bg-transparent'}`} />
+                                 )))}
+                             </div>
+                        )}
+                     </div>
+                  </div>
               </div>
               <div className="flex justify-between gap-4">
                   <div className="flex-1">
@@ -545,7 +598,11 @@ export default function App() {
               {!gameOver && (
                 <div className="flex gap-2">
                   <button 
-                    onClick={startGame} 
+                    onClick={() => {
+                       setIsManuallyPaused(false);
+                       startGame();
+                       document.body.focus();
+                    }} 
                     className="flex-1 flex items-center justify-center gap-1 bg-red-950 hover:bg-red-900 text-red-200 border-2 border-red-800 transition-all font-bold tracking-widest text-[10px] py-2"
                   >
                     RESTART
@@ -566,7 +623,7 @@ export default function App() {
               {score >= 5000 && (
                  <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-0 text-center animate-pulse relative overflow-hidden">
                     <div className="bg-yellow-600 px-2 py-1 text-[10px] text-black font-bold tracking-widest border-b border-yellow-500 flex justify-between items-center">
-                       <span> Arc TETRIS EXCLUSIVE</span>
+                       <span>Arc TETRIS EXCLUSIVE</span>
                        <span>MINT READY</span>
                     </div>
                     <div className="p-4 relative">
@@ -595,13 +652,16 @@ export default function App() {
                              const signer = await provider.getSigner();
                              
                              setMintStatus("MINTING ON ARC...");
-                             const dataPayload = ethers.hexlify(ethers.toUtf8Bytes(`ARC_TETRIS_MINT_NFT_SCORE:${score}`));
+                             const contractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+                             const abi = [
+                               "function mintNFT(uint256 score, uint256 lines, uint256 level, uint256 tetrises, uint256 tetrisRateBps, uint256 drought, string metadataURI) public returns (uint256)"
+                             ];
+                             const contract = new ethers.Contract(contractAddress, abi, signer);
                              
-                             const tx = await signer.sendTransaction({
-                               to: "0x0000000000000000000000000000000000000000",
-                               value: 0,
-                               data: dataPayload
-                             });
+                             const tetrisRateBps = isNaN(tetrisRate) ? 0 : Math.floor(tetrisRate * 100);
+                             const metadata_URI = generateMetadataURI(score, linesClearedLocal, level, tetrisClears || 0, tetrisRate || 0, drought);
+                             
+                             const tx = await contract.mintNFT(score, linesClearedLocal, level, tetrisClears || 0, tetrisRateBps, drought, metadata_URI);
                              
                              setMintTxHash(tx.hash);
                              await tx.wait();
