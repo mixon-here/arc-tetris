@@ -302,10 +302,13 @@ export const useTetris = (isPaused: boolean = false) => {
   // keydown events
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (gameOver || player.collided || isPaused) return;
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
+      // Always prevent default for arrows and space to stop page scrolling if game is active
+      if (!gameOver && ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
          e.preventDefault();
       }
+      
+      if (gameOver || player.collided || isPaused) return;
+
       if (e.keyCode === 37) movePlayer(-1);
       else if (e.keyCode === 39) movePlayer(1);
       else if (e.keyCode === 40) dropPlayer();
@@ -344,11 +347,11 @@ export const useTetris = (isPaused: boolean = false) => {
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, { passive: false });
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [gameOver, movePlayer, dropPlayer, playerRotate, hardDrop]);
+  }, [gameOver, movePlayer, dropPlayer, playerRotate, hardDrop, isPaused, player.collided]);
 
   const tetrisRate = linesClearedLocal > 0 ? ((tetrisClears * 4) / linesClearedLocal) * 100 : 0;
 

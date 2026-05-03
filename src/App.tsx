@@ -69,10 +69,11 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
 
 export default function App() {
   const [isMinting, setIsMinting] = useState(false);
+  const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [mintStatus, setMintStatus] = useState("MINT NFT");
   const [mintTxHash, setMintTxHash] = useState<string | null>(null);
 
-  const { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought } = useTetris(isMinting);
+  const { board, startGame, gameOver, score, linesClearedLocal, level, tetrisEffect, movePlayer, dropPlayer, playerRotate, hardDrop, tetrisRate, drought } = useTetris(isMinting || isManuallyPaused);
 
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
@@ -294,15 +295,6 @@ export default function App() {
           <div className="bg-neutral-900 border-4 border-green-700 p-6 rounded-md shadow-[0_0_20px_rgba(0,255,0,0.2)]">
             <div className="flex items-center justify-between mb-6">
                <h1 className="text-3xl text-green-400 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)] leading-snug">Arc<br/>Tetris</h1>
-               <a 
-                 href="https://x.com/mixon_here" 
-                 target="_blank" 
-                 rel="noopener noreferrer"
-                 className="flex flex-col items-center gap-1 opacity-80 hover:opacity-100 transition-opacity bg-black/40 px-2 py-1 rounded border border-green-900/50"
-               >
-                 <span className="text-[9px] font-sans text-green-500 uppercase tracking-widest text-center leading-tight">developed<br/>by</span>
-                 <img src="https://unavatar.io/x/mixon_here?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" alt="mixon_here avatar" className="w-6 h-6 rounded-full border border-green-500" />
-               </a>
             </div>
             
             {!walletAddress ? (
@@ -315,7 +307,7 @@ export default function App() {
               </button>
             ) : (
               <div className="flex flex-col gap-3">
-                <div className="bg-neutral-950 p-3 border-2 border-green-800 flex flex-col gap-1">
+                <div className="p-3 border-2 border-green-800 flex flex-col gap-1">
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] text-green-700">WALLET:</span>
                     <button 
@@ -459,7 +451,7 @@ export default function App() {
                         <div className="flex flex-col items-center gap-6">
                             <div className="text-green-400 text-xs text-center border-2 border-green-800 p-6 bg-green-900/20 max-w-[280px]">
                               TRANSACTION SUCCESSFUL!<br/><br/>
-                              <a href={`https://explorer.testnet.arc.xyz/tx/${txHash}`} target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">VIEW IN EXPLORER</a>
+                              <a href={`https://testnet.arcscan.app/tx/${txHash}`} target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">VIEW IN EXPLORER</a>
                             </div>
                             <button
                               onClick={() => { setTxHash(null); startGame(); }}
@@ -516,6 +508,18 @@ export default function App() {
                 )}
               </div>
             )}
+            
+            <div className="mt-4 flex justify-center">
+               <a 
+                 href="https://x.com/mixon_here" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity px-2 py-1"
+               >
+                 <span className="text-[10px] font-sans text-neutral-500 tracking-widest text-center leading-tight">developed by</span>
+                 <img src="https://unavatar.io/x/mixon_here?fallback=https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png" alt="mixon_here avatar" className="w-5 h-5 rounded-full border border-neutral-600 grayscale hover:grayscale-0 transition-all" />
+               </a>
+            </div>
         </div>
 
         {/* Stats Column */}
@@ -536,6 +540,28 @@ export default function App() {
                      <div className="text-xl text-blue-300">{level.toString().padStart(2, '0')}</div>
                   </div>
               </div>
+
+              {/* Controls */}
+              {!gameOver && (
+                <div className="flex gap-2">
+                  <button 
+                    onClick={startGame} 
+                    className="flex-1 flex items-center justify-center gap-1 bg-red-950 hover:bg-red-900 text-red-200 border-2 border-red-800 transition-all font-bold tracking-widest text-[10px] py-2"
+                  >
+                    RESTART
+                  </button>
+                  <button
+                    onClick={() => {
+                        setIsManuallyPaused(p => !p);
+                        // give focus to document body so playing works smoothly
+                        document.body.focus();
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-1 transition-all font-bold tracking-widest text-[10px] py-2 border-2 ${isManuallyPaused ? 'bg-yellow-900 hover:bg-yellow-800 text-yellow-200 border-yellow-700' : 'bg-blue-950 hover:bg-blue-900 text-blue-200 border-blue-800'}`}
+                  >
+                    {isManuallyPaused ? 'RESUME' : 'PAUSE'}
+                  </button>
+                </div>
+              )}
               
               {score >= 5000 && (
                  <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-0 text-center animate-pulse relative overflow-hidden">
@@ -600,7 +626,7 @@ export default function App() {
                        {mintTxHash && (
                            <div className="text-center mt-2">
                              <a 
-                               href={`https://explorer.testnet.arc.xyz/tx/${mintTxHash}`} 
+                               href={`https://testnet.arcscan.app/tx/${mintTxHash}`} 
                                target="_blank" 
                                rel="noopener noreferrer"
                                className="text-[10px] text-yellow-400 hover:text-yellow-300 underline font-mono inline-flex items-center gap-1"
