@@ -68,23 +68,35 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
 };
 
 const generateMetadataURI = (score: number, lines: number, level: number, tetrises: number, tetrisRate: number, drought: number) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" style="background:#0a0a0a; border:4px solid #16a34a; font-family:monospace;">
-    <foreignObject x="0" y="0" width="400" height="400">
-      <div xmlns="http://www.w3.org/1999/xhtml" style="color:white; padding: 20px; font-family: monospace;">
-        <h1 style="color:#4ade80; text-align:center; font-size:32px; margin:0; text-shadow:0 0 10px #4ade80;">ARC TETRIS</h1>
-        <h2 style="color:#facc15; text-align:center; font-size:16px; margin-top:5px; margin-bottom:20px; text-transform:uppercase; letter-spacing:4px;">Achievement Unlocked</h2>
-        <div style="border: 2px solid #1e3a8a; background: rgba(30,58,138,0.2); padding: 15px;">
-           <p style="font-size: 18px; margin: 5px 0;">SCORE: <span style="color:#93c5fd">${score}</span></p>
-           <p style="font-size: 18px; margin: 5px 0;">LINES: <span style="color:#93c5fd">${lines}</span></p>
-           <p style="font-size: 18px; margin: 5px 0;">LEVEL: <span style="color:#93c5fd">${level}</span></p>
-           <p style="font-size: 18px; margin: 5px 0;">TETRISES: <span style="color:#93c5fd">${tetrises}</span></p>
-           <p style="font-size: 18px; margin: 5px 0;">TETRIS RATE: <span style="color:#93c5fd">${tetrisRate.toFixed(1)}%</span></p>
-           <p style="font-size: 18px; margin: 5px 0;">DROUGHT: <span style="color:#93c5fd">${drought}</span></p>
-        </div>
-        <p style="color:#6b7280; text-align:center; font-size:12px; margin-top:30px;">Minted on Arc Testnet</p>
-      </div>
-    </foreignObject>
-  </svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" style="background:#0a0a0a; font-family:monospace;">
+  <rect width="100%" height="100%" fill="#0a0a0a" />
+  <rect x="2" y="2" width="396" height="396" fill="none" stroke="#16a34a" stroke-width="4" />
+  
+  <text x="200" y="50" fill="#4ade80" font-size="32" font-weight="bold" text-anchor="middle">ARC TETRIS</text>
+  <text x="200" y="80" fill="#facc15" font-size="16" letter-spacing="2" text-anchor="middle">ACHIEVEMENT UNLOCKED</text>
+  
+  <rect x="20" y="110" width="360" height="230" fill="#1e3a8a" fill-opacity="0.2" stroke="#1e3a8a" stroke-width="2" />
+  
+  <text x="40" y="145" fill="#ffffff" font-size="20">SCORE:</text>
+  <text x="360" y="145" fill="#93c5fd" font-size="20" text-anchor="end">${score}</text>
+  
+  <text x="40" y="180" fill="#ffffff" font-size="20">LINES:</text>
+  <text x="360" y="180" fill="#93c5fd" font-size="20" text-anchor="end">${lines}</text>
+  
+  <text x="40" y="215" fill="#ffffff" font-size="20">LEVEL:</text>
+  <text x="360" y="215" fill="#93c5fd" font-size="20" text-anchor="end">${level}</text>
+  
+  <text x="40" y="250" fill="#ffffff" font-size="20">TETRISES:</text>
+  <text x="360" y="250" fill="#93c5fd" font-size="20" text-anchor="end">${tetrises}</text>
+  
+  <text x="40" y="285" fill="#ffffff" font-size="20">TETRIS RATE:</text>
+  <text x="360" y="285" fill="#93c5fd" font-size="20" text-anchor="end">${tetrisRate.toFixed(1)}%</text>
+  
+  <text x="40" y="320" fill="#ffffff" font-size="20">DROUGHT:</text>
+  <text x="360" y="320" fill="#93c5fd" font-size="20" text-anchor="end">${drought}</text>
+  
+  <text x="200" y="380" fill="#6b7280" font-size="14" text-anchor="middle">Minted on Arc Testnet</text>
+</svg>`;
   
   const svgBase64 = window.btoa(unescape(encodeURIComponent(svg)));
   const json = JSON.stringify({
