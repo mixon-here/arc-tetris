@@ -383,7 +383,7 @@ export default function App() {
                     <span>{txCount}</span>
                   </div>
                 )}
-                <div className="text-[10px] text-green-600 text-right mt-1 font-bold">NET: ARC TESTNET</div>
+                <div className="text-[10px] text-green-600 text-right mt-1 font-bold">NET: Arc TESTNET</div>
               </div>
             )}
           </div>
