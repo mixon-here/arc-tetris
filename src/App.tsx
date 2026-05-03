@@ -54,12 +54,12 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-      <div className="bg-neutral-900 border-4 border-green-600 max-w-lg w-full p-6 shadow-[0_0_50px_rgba(0,255,0,0.3)] relative">
+      <div className="bg-neutral-900 border-4 border-green-600 max-w-lg w-full p-6 shadow-[0_0_50px_rgba(0,255,0,0.3)] relative max-h-[95vh] flex flex-col">
         <button onClick={onClose} className="absolute top-2 right-2 text-green-500 hover:text-white font-bold p-2">
           <X className="w-5 h-5" />
         </button>
-        <h2 className="text-xl text-green-400 mb-6 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)]">{title}</h2>
-        <div className="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-4 text-sm text-neutral-300">
+        <h2 className="text-xl text-green-400 mb-6 drop-shadow-[0_0_5px_rgba(0,255,0,0.8)] flex-shrink-0 uppercase">{title}</h2>
+        <div className="overflow-y-auto pr-2 custom-scrollbar flex flex-col gap-4 text-sm text-neutral-300">
           {children}
         </div>
       </div>
@@ -67,8 +67,8 @@ const Modal = ({ isOpen, onClose, title, children }: any) => {
   );
 };
 
-const generateMetadataURI = (score: number, lines: number, level: number, tetrises: number, tetrisRate: number, drought: number) => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" style="background:#0a0a0a; font-family:monospace;">
+export const generateNFT_SVG = (score: number, lines: number, level: number, tetrises: number, tetrisRate: number, drought: number) => {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" style="background:#0a0a0a; font-family:monospace;">
   <rect width="100%" height="100%" fill="#0a0a0a" />
   <rect x="2" y="2" width="396" height="396" fill="none" stroke="#16a34a" stroke-width="4" />
   
@@ -90,13 +90,17 @@ const generateMetadataURI = (score: number, lines: number, level: number, tetris
   <text x="360" y="250" fill="#93c5fd" font-size="20" text-anchor="end">${tetrises}</text>
   
   <text x="40" y="285" fill="#ffffff" font-size="20">TETRIS RATE:</text>
-  <text x="360" y="285" fill="#93c5fd" font-size="20" text-anchor="end">${tetrisRate.toFixed(1)}%</text>
+  <text x="360" y="285" fill="#93c5fd" font-size="20" text-anchor="end">${Number(tetrisRate).toFixed(1)}%</text>
   
   <text x="40" y="320" fill="#ffffff" font-size="20">DROUGHT:</text>
   <text x="360" y="320" fill="#93c5fd" font-size="20" text-anchor="end">${drought}</text>
   
   <text x="200" y="380" fill="#6b7280" font-size="14" text-anchor="middle">Minted on Arc Testnet</text>
 </svg>`;
+};
+
+const generateMetadataURI = (score: number, lines: number, level: number, tetrises: number, tetrisRate: number, drought: number) => {
+  const svg = generateNFT_SVG(score, lines, level, tetrises, tetrisRate, drought);
   
   const svgBase64 = window.btoa(unescape(encodeURIComponent(svg)));
   const json = JSON.stringify({
@@ -633,16 +637,16 @@ export default function App() {
               )}
               
               {score >= 5000 && (
-                 <div className="mt-4 border border-yellow-500 bg-yellow-900/30 p-0 text-center animate-pulse relative overflow-hidden">
+                 <div className="mt-4 border border-yellow-500 bg-black text-center animate-pulse relative overflow-hidden">
                     <div className="bg-yellow-600 px-2 py-1 text-[10px] text-black font-bold tracking-widest border-b border-yellow-500 flex justify-between items-center">
                        <span>Arc TETRIS EXCLUSIVE</span>
-                       <span>MINT READY</span>
+                       <span>NFT PREVIEW</span>
                     </div>
-                    <div className="p-4 relative">
-                       <img src="/Tim-Arc1.png" alt="Tim Toasty" className="absolute opacity-20 w-32 h-32 top-[-20px] right-[-20px] object-contain rotate-12 drop-shadow-xl" />
-                       <div className="text-yellow-400 font-bold mb-2 relative z-10 text-xl tracking-tight leading-none drop-shadow-md">
-                          <span className="text-3xl text-white">{score}</span>
-                          <span className="block text-sm text-yellow-500 mt-1 uppercase">PTS NFT UNLOCKED</span>
+                    <div className="p-4 relative flex flex-col items-center">
+                       <div className="w-[180px] h-[180px] shadow-[0_0_15px_rgba(34,197,94,0.3)] bg-black mb-3 border border-green-800" dangerouslySetInnerHTML={{ __html: generateNFT_SVG(score, linesClearedLocal, level, tetrisClears || 0, tetrisRate || 0, drought).replace(/width="400" height="400"/, 'width="100%" height="100%" viewBox="0 0 400 400"') }} />
+                       
+                       <div className="text-yellow-400 font-bold mb-2 relative z-10 text-xs tracking-tight leading-none drop-shadow-md uppercase">
+                          Your Onchain Achievement
                        </div>
                        
                        <div className="grid grid-cols-2 gap-2 text-left bg-black/40 border border-yellow-500/30 p-2 mb-3 relative z-10 text-[10px] text-yellow-300 font-mono tracking-tighter">
@@ -736,7 +740,7 @@ export default function App() {
                 onClick={() => setShowAboutArc(true)} 
                 className="bg-yellow-900/30 hover:bg-yellow-900/60 border-2 border-yellow-700 p-5 text-yellow-500 font-bold tracking-widest text-sm flex items-center justify-between transition-colors shadow-[0_0_15px_rgba(255,255,0,0.1)]"
               >
-                <div>About Arc</div>
+                <div>ARC FAUCET</div>
                 <AlertTriangle className="w-5 h-5"/>
               </button>
            </div>
@@ -751,47 +755,39 @@ export default function App() {
       </div>
 
       {/* Modals */}
-      <Modal isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} title="HOW TO PLAY Arc Tetris">
-         <div className="flex gap-4">
+      <Modal isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} title="HOW TO PLAY ARC TETRIS">
+         <div className="flex gap-4 items-center">
             <div className="flex-1">
-               <p>Arc Tetris is a classic block-stacking puzzle game merged with onchain features!</p>
-               <ul className="list-disc pl-5 space-y-3 mt-4 text-green-300">
-                  <li><strong>Clear Lines:</strong> Fill an entire horizontal row to clear it and earn points. The game speeds up every 10 lines!</li>
-                  <li><strong>Score a 'TETRIS':</strong> Clear 4 lines at once (using the long 'I' piece) for a massive point boost. Watch your Tetris Rate climb!</li>
-                  <li><strong>Arc Bonus:</strong> Look out for blocks containing the letters <strong>A</strong>, <strong>R</strong>, <strong>C</strong>.</li>
-                  <li><strong>Ultra Bonus:</strong> If you clear a line that creates the word A-R-C, you get a +1000pts Ultra Bonus!</li>
-                  <li><strong>Compete:</strong> Connect your wallet to post your highest score to the global leaderboard on Arc.</li>
+               <ul className="list-disc pl-5 space-y-2 text-green-300 text-xs sm:text-sm">
+                  <li><strong>Clear Lines:</strong> Fill horizontal rows to earn points. Speeds up every 10 lines!</li>
+                  <li><strong>TETRIS:</strong> Clear 4 lines at once for a massive point boost.</li>
+                  <li><strong>A-R-C Bonus:</strong> Clear a line containing A-R-C for +1000pts!</li>
+                  <li><strong>Compete:</strong> Connect wallet to post high scores to Arc.</li>
+                  <li><strong>Mint NFT:</strong> Score 5000+ to mint an exclusive onchain achievement!</li>
                </ul>
             </div>
-            <div className="w-24 sm:w-32 flex-shrink-0">
+            <div className="w-20 sm:w-28 flex-shrink-0">
                <img src="/Tim-Arc1.png" alt="Tim Toasty" className="w-full object-contain filter drop-shadow-lg" />
             </div>
          </div>
       </Modal>
 
-      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="ABOUT Arc">
-         <div className="bg-yellow-900/20 border-l-4 border-yellow-600 p-4 mb-4">
-            <h3 className="text-yellow-500 font-bold mb-2 flex items-center gap-2">
-               <AlertTriangle className="w-4 h-4"/> THE INTERNET FINANCIAL SYSTEM
-            </h3>
+      <Modal isOpen={showAboutArc} onClose={() => setShowAboutArc(false)} title="ARC FAUCET & NETWORK">
+         <div className="bg-yellow-900/20 border-l-4 border-yellow-600 p-4">
             <p className="text-yellow-300/80 leading-relaxed text-sm">
-               At the end of your game session, Arc seamlessly records your final score directly on the internet financial system.
-               A micro-fee is settled proportionally based on the number of lines you cleared (simulating network usage), creating a transparent leaderboard owned by the players.
+               Arc Tetris uses the internet financial system to save your high scores securely onchain. 
+               To submit scores, you'll need test USDC tokens for micro-fees (simulating network usage).
             </p>
          </div>
-         <p>Arc provides the essential blockspace for builders. Gameplay remains completely uninterrupted, showing how developers can build persistent, reliable applications on the internet without traditional centralized databases.</p>
-         
-         <div className="mt-8">
-            <a 
-               href="https://faucet.circle.com/" 
-               target="_blank" 
-               rel="noreferrer"
-               className="inline-flex w-full text-sm text-neutral-900 font-bold bg-yellow-500 hover:bg-yellow-400 p-4 justify-center items-center gap-2 transition-colors uppercase tracking-widest"
-               title="Get test USDC from Circle's universal faucet"
-            >
-               <ExternalLink className="w-4 h-4"/> GET TEST USDC FROM FAUCET
-            </a>
-         </div>
+         <a 
+            href="https://faucet.circle.com/" 
+            target="_blank" 
+            rel="noreferrer"
+            className="inline-flex w-full text-sm text-neutral-900 font-bold bg-yellow-500 hover:bg-yellow-400 p-4 justify-center items-center gap-2 transition-colors uppercase tracking-widest mt-2"
+            title="Get test USDC from Circle's universal faucet"
+         >
+            <ExternalLink className="w-4 h-4"/> GET TEST USDC FROM FAUCET
+         </a>
       </Modal>
 
       <Modal isOpen={showLeaderboard} onClose={() => setShowLeaderboard(false)} title="GLOBAL LEADERBOARD">
