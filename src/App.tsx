@@ -551,7 +551,7 @@ export default function App() {
                 ) : (
                   <div className="flex flex-col items-center gap-6">
                     <p className="text-xs text-yellow-500 max-w-[280px] leading-relaxed">
-                      Welcome! This is a test Tetris game built on the Arc network. Join in and be one of the pioneers!
+                      Welcome! This is a test Tetris game for testing Arc testnet. Join in and be one of the pioneers!
                     </p>
                     <p className="text-xs text-purple-400 max-w-[280px] leading-relaxed">
                       Collect a "Tetris" (4 lines) to get an easter egg from Tim, the Arc architect!
